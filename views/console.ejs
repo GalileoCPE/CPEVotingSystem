@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="CPE Voting System">
+  <meta name="author" content="Pierre AVINAIN, Galileo CPE Lyon">
+  <title>CPE Voting System</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+  <!-- Icons -->
+  <link href="/console/vendor/nucleo/css/nucleo.css" rel="stylesheet">
+  <link href="/console/vendor/@fortawesome/fontawesome-free/css/all.min.css" rel="stylesheet">
+  
+  <!-- Argon CSS -->
+  <link type="text/css" href="/console/css/argon.css?v=1.0.0" rel="stylesheet">
+</head>
+
+<body class="bg-default">
+  <!-- Sidenav -->
+  <!-- Main content -->
+  <div class="main-content">
+    <!-- Top navbar -->
+    <nav class="navbar navbar-top navbar-expand-md navbar-dark" id="navbar-main">
+      <div class="container-fluid">
+        <!-- TITLE -->
+        <a class="h1 mb-0 text-white text-uppercase d-none d-lg-inline-block" href="#">CPE Voting System</a>
+
+        <!-- TIME -->
+        <span class="mb-0 text-sm font-weight-bold" style="color: white; font-size: 1.5rem !important;">
+        	<span id="timestamp"></span>
+        </span>
+      </div>
+    </nav>
+
+
+    <!-- CONNEXION -->
+
+    <div class="header bg-gradient-primary py-7 py-lg-8 auth">
+      <div class="container">
+        <div class="header-body text-center mb-7">
+          <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-6">
+              <h1 class="text-white">Bienvenue !</h1>
+              <p class="text-lead text-light">Saisissez votre clé de sécurité pour accèder à la console.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="separator separator-bottom separator-skew zindex-100">
+        <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1" xmlns="http://www.w3.org/2000/svg">
+          <polygon class="fill-default" points="2560 0 2560 100 0 100"></polygon>
+        </svg>
+      </div>
+    </div>
+
+    <div class="container mt--8 pb-5 auth">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+          <div class="card bg-secondary shadow border-0">
+            <div class="card-body px-lg-5 py-lg-5">
+	            <div class="form-group">
+	              <div class="input-group input-group-alternative">
+	                <div class="input-group-prepend">
+	                  <span class="input-group-text"><i class="ni ni-lock-circle-open"></i></span>
+	                </div>
+	                <input class="form-control" placeholder="Clé de sécurité" type="password" name="key" id="key" autofocus>
+	              </div>
+	            </div>
+	            <div class="text-center">
+	              <button type="button" onclick="main_auth();" class="btn btn-primary my-4">Valider</button>
+	            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <!-- PRINCIPAL -->
+
+    <div class="header bg-gradient-primary pb-8 pt-5 pt-md-8 main">
+      <div class="container-fluid">
+        <div class="header-body">
+          <!-- Card stats -->
+          <div class="row">
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Etat système</h5>
+                  <span class="h2 font-weight-bold mb-0">
+                  	<span id="sys_state">Attente de connexion...</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Cloture des votes</h5>
+                  <span class="h2 font-weight-bold mb-0">
+                  	<span id="votes_closed">--</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Candidat</h5>
+                  <span class="h2 font-weight-bold mb-0">
+                  	<span id="current_candidate">--</span><br/>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-3 col-lg-6">
+              <div class="card card-stats mb-4 mb-xl-0">
+                <div class="card-body">
+                  <h5 class="card-title text-uppercase text-muted mb-0">Passage</h5>
+                  <span class="h2 font-weight-bold mb-0">
+                  	<span id="passage">--</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Page content -->
+    <div class="container-fluid mt--7 main">
+      <!-- Table -->
+      <div class="row">
+        <div class="col-md-8">
+          <div class="card shadow">
+            <div class="card-header border-0">
+            	<a href="#" onclick="candidate_new();" class="btn btn-sm btn-success" style="float: right;"><i class="fa fa-plus"></i> Nouveau candidat</a>
+
+            	<h3 class="mb-0">Candidats</h3>
+            	<div style="clear: right;"></div>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush" id="candidates_table"></table>
+            </div>
+          </div>
+
+          <div class="card shadow" style="margin-top: 40px;">
+            <div class="card-header border-0">
+        		<a href="#" onclick="comments_toggle();" class="btn btn-sm btn-primary comments_enabled" style="float: right;"><i class="fa fa-lock"></i> Désactiver les messages</a>
+        		<a href="#" onclick="comments_toggle();" class="btn btn-sm btn-primary comments_disabled" style="float: right; display: none;"><i class="fa fa-unlock"></i> Activer les messages</a>
+
+            	<h3 class="mb-0">Mur des messages (<span id="comments_count">0</span>)</h3>
+            	<div style="clear: right;"></div>
+            </div>
+
+            <div class="table-responsive comments_enabled">
+              <table class="table align-items-center table-flush" id="comments_table"></table>
+            </div>
+
+            <div class="card-body comments_disabled" style="display: none;">
+	            <div class="alert alert-warning">
+	            	Les messages sont désactivés.
+	            </div>
+	        </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card shadow">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Gestion</h3>
+            </div>
+
+            <div class="card-body">
+            	<div id="action_candidats">
+                <div class="row">
+              		<div class="col-sm-6">
+  		            	<h6 class="heading-small text-muted">Prochain candidat :</h6>
+
+  			            <button class="btn btn-success btn-sm mb-2" onclick="candidate_start();">
+        							<i class="fa fa-rocket"></i> Lancer passage <span id="nc"></span>
+        						</button>
+        						<br/>
+        						<button class="btn btn-warning btn-sm" onclick="candidate_end();">
+        							<i class="fa fa-stop-circle"></i> Terminer passage <span id="cc"></span>
+        						</button>
+  		            </div>
+  		            <div class="col-sm-6">
+        						<select id="next_candidate" class="form-control" onchange="next_candidate_change(this);"></select>
+        					</div>
+                </div>
+                <br/>
+                <center>
+                  <button class="btn btn-sm btn-primary" onclick="generique();"><i class="fa fa-video"></i> Lancer le générique</button>
+                  <br/>
+                  <small style="color: red">DISPLAY 1 doit avoir activé l'autoplay<br/>chrome://flags/#autoplay-policy</a></small>
+                </center>
+      				</div>
+
+      				<div class="row mt-5" id="action_cloture">
+            		<div class="col-sm-6">
+		            	<h6 class="heading-small text-muted">Cloturer dans :</h6>
+
+						<button class="btn btn-danger btn-sm" onclick="cloturer();">
+							<i class="fa fa-hand-paper"></i> Cloturer les votes
+						</button>
+		            </div>
+		            <div class="col-sm-6">
+						<select id="cloture_delay" class="form-control">
+							<option value="10">10s</option>
+							<option value="30">30s</option>
+							<option value="60">1min</option>
+							<option value="180">3min</option>
+							<option value="300">5min</option>
+							<option value="600">10min</option>
+						</select>
+					</div>
+				</div>
+
+				<h6 class="heading-small text-muted mt-5">Nouvelle clé de sécurité :</h6>
+				<input type=text name="editkey" id="editkey"/> <button class="btn btn-sm btn-primary" onclick="update_security_key()">Modifier</button>
+
+				<div class="row mt-5">
+					<div class="col-md-4">
+						<h6 class="heading-small text-muted">Ecran 0 :</h6>
+					</div>
+					<div class="col-md-8">
+						<button class="btn btn-sm" id="0-names" onclick="update_screen(0, 'names');">
+              <i class="fa fa-tags"></i>
+            </button>
+						<button class="btn btn-sm" id="0-comments" onclick="update_screen(0, 'comments');">
+              <i class="fa fa-comments"></i>
+            </button>
+						<button class="btn btn-sm" id="0-none" onclick="update_screen(0, 'none');">
+              <i class="fa fa-times-circle"></i>
+            </button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<h6 class="heading-small text-muted">Ecran 1 :</h6>
+					</div>
+					<div class="col-md-8">
+						<button class="btn btn-sm" id="1-names" onclick="update_screen(1, 'names');">
+              <i class="fa fa-tags"></i>
+            </button>
+            <button class="btn btn-sm" id="1-comments" onclick="update_screen(1, 'comments');">
+              <i class="fa fa-comments"></i>
+            </button>
+            <button class="btn btn-sm" id="1-none" onclick="update_screen(1, 'none');">
+              <i class="fa fa-times-circle"></i>
+            </button>
+					</div>
+				</div>
+				<div class="row">
+					<div class="col-md-4">
+						<h6 class="heading-small text-muted">Ecran 2 :</h6>
+					</div>
+					<div class="col-md-8">
+						<button class="btn btn-sm" id="2-names" onclick="update_screen(2, 'names');">
+              <i class="fa fa-tags"></i>
+            </button>
+            <button class="btn btn-sm" id="2-comments" onclick="update_screen(2, 'comments');">
+              <i class="fa fa-comments"></i>
+            </button>
+            <button class="btn btn-sm" id="2-none" onclick="update_screen(2, 'none');">
+              <i class="fa fa-times-circle"></i>
+            </button>
+					</div>
+				</div>
+            </div>
+          </div>
+
+          <div class="card shadow" style="margin-top: 40px;">
+            <div class="card-header border-0">
+              <h3 class="mb-0">Votes (<span id="votes_count">0</span>)</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="table align-items-center table-flush" id="votes_table"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <footer class="footer">
+        <div class="row align-items-center justify-content-xl-between">
+          <div class="col-xl-6">
+            <div class="copyright text-center text-xl-left text-muted">
+              &copy; 2018 Pierre AVINAIN & Galileo - Theme by <a href="https://www.creative-tim.com" class="font-weight-bold ml-1" target="_blank">Creative Tim</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </div>
+
+	<!-- Argon Scripts -->
+	<!-- Core -->
+	<script src="/console/vendor/jquery/dist/jquery.min.js"></script>
+	<script src="/console/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+	<!-- Argon JS -->
+	<script src="/console/js/argon.js?v=1.0.0"></script>
+
+	<!-- Socket.IO -->
+	<script src="/socket.io/socket.io.js"></script>
+
+	<script src="/console/js/script-console.js"></script>
+	<script>callOnLoad();</script>
+
+	<script src="/client/dyn-script-console.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,158 @@
+/*
+ * ===== CPEVotingSystem =====
+ * | Script principal client display
+ * | (c) 2018 - Pierre AVINAIN Galileo CPE Lyon
+ * ===========================
+ */
+
+console.log("====== CPEVotingSystem - (c) 2018 Pierre AVINAIN Galileo CPE LYON ======");
+var socket = io.connect("<%= APP_socketurl %>/?mode=display");
+
+var Datas = {
+	VW: null
+}
+
+const DONE = 1;
+const CURRENT = 2;
+const PENDING = 3;
+
+const SCR_NAMES = "names";
+const SCR_COMMENTS = "comments";
+const SCR_NONE = "none";
+const ALL_SCR_TYPES = [SCR_NAMES, SCR_COMMENTS, SCR_NONE];
+const NB_SCR = 3; // Nombre d'écrans
+const GENERIQUE_SCREEN = 1; // Video de generique sur ecran 1
+const COMMENTS_NB = 8; // Nombre de messages à afficher sur l'écran
+
+/*
+ * AUTHENTIFICATION / HANDSHAKE
+ */
+socket.on('main.welcome', function(e) {
+	console.log("Connected to VotingServer. Welcome!");
+});
+
+socket.on('main.vw', function(VW) { update_VW(VW); });
+socket.on('candidate.start', function(VW) { update_VW(VW); });
+socket.on('candidate.end', function(VW) { update_VW(VW); });
+socket.on('candidate.rename', function(VW) { update_VW(VW); });
+socket.on('candidate.new', function(VW) { update_VW(VW); });
+socket.on('comments.update', function(VW) { update_VW(VW); });
+socket.on('screens.update', function(VW) { update_VW(VW); });
+socket.on('main.update_security_key', function(VW) { update_VW(VW); });
+socket.on('cloture', function(VW) {
+	update_VW(VW);
+
+	// Affichage du compte a rebours
+	let cloture_time = (new Date(VW.votes_closed)).getTime();
+	let current_time = (new Date()).getTime();
+	let delay = Math.round( (cloture_time - current_time)/1000 );
+	console.log("Cloture des votes à : " + VW.votes_closed + ", dans " + delay + "s.");
+	countdown(delay);
+});
+
+// Ecran noir
+socket.on('screens.generique', function(e) {
+	// Tout le monde fait un blackscreen
+	blackscreen();
+
+	// On lance la vidéo pour le bon écran
+	if(DispID == GENERIQUE_SCREEN)
+		setTimeout(generique, 3000); // Apres 1.5 sec
+});
+
+function update_VW(VW) {
+	// Nom de l'évènement
+	if(Datas.VW == null || VW.hostpost != Datas.VW.hostpost)
+		$("#hostpost-name").text(VW.hostpost);
+
+	// Si on change de section...
+	let scrType = VW.screens["s" + DispID];
+	if(Datas.VW == null || scrType != Datas.VW.screens["s" + DispID] || VW.enable_comments != Datas.VW.enable_comments) {
+		for (let i = 0; i < ALL_SCR_TYPES.length; i++) {
+			$("#" + ALL_SCR_TYPES[i] + "_section").hide();
+		}
+
+		if(!VW.enable_comments && scrType == SCR_COMMENTS)
+			$("#none_section").show();
+		else
+			$("#" + scrType + "_section").show();
+	}
+
+	// Candidat actuel
+	let current_candidate = getCandidateName(VW.candidates, VW.current_candidate);
+	// Si on change de candidat...
+	if(Datas.VW == null || VW.current_candidate != Datas.VW.current_candidate) {
+		if(VW.current_candidate != null) {
+			// Si on avait un candidat avant, on fait un out d'abord
+			if(Datas.VW != null && Datas.VW.current_candidate != null) {
+				singer_out();
+				setTimeout(singer_in, 7000, current_candidate, " ");
+			} else
+				singer_in(current_candidate, " ");
+		} else
+			singer_out();
+	}
+
+	// Nombre de votes
+	let votes_count = Object.keys(VW.votes).length;
+	$("#votes_count").text(votes_count);
+
+	// Mur des messages
+	if(!VW.enable_comments)
+		$("#comments_section").hide();
+
+	// Pour les 8 derniers messages
+	let comments_html = '';
+	let N = (VW.comments.length >= COMMENTS_NB) ? COMMENTS_NB : VW.comments.length
+	for (let i = 0; i < N; i++) {
+		if(i > 0)
+			comments_html += '<hr/>';
+		comments_html += '<h2>' + escapeHtml(VW.comments[i]) + '</h2>';
+	}
+	$("#comments").html(comments_html);
+
+	Datas.VW = VW;
+}
+
+function getCandidateName(candidates, ID) {
+	return (ID in candidates) ? candidates[ID].name : '--';
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }
+
+ /*****************
+ *** GENERIQUE ***
+ *****************/
+
+// Lance la vidéo de générique
+function generique() {
+	console.log("Generique started");
+	$("#genevid").show();
+
+	let genevid = document.getElementById("genevid");
+
+	// Lancement de la video
+	genevid.play();
+
+	// Evenement sur la fin de la video
+	genevid.onended = function() {
+		$("#genevid").hide();
+
+		// On dit qu'on a fini, après qq secondes
+		setTimeout(function() {
+			socket.emit('screens.generique.ended', {});
+		}, 2000);
+	};
+}
+
+// Fin du générique
+socket.on('screens.generique.ended', function(e) {
+	whitescreen();
+});

@@ -1,0 +1,375 @@
+/*
+ * ===== CPEVotingSystem =====
+ * | Script principal client console
+ * | (c) 2018 - Pierre AVINAIN Galileo CPE Lyon
+ * ===========================
+ */
+
+console.log("====== CPEVotingSystem - (c) 2018 Pierre AVINAIN Galileo CPE LYON ======");
+var socket = io.connect("<%= APP_socketurl %>/?mode=console");
+
+var Datas = {
+	ckey: null,
+	VW: null
+}
+
+const DONE = 1;
+const CURRENT = 2;
+const PENDING = 3;
+
+const SCR_NAMES = "names";
+const SCR_COMMENTS = "comments";
+const SCR_NONE = "none";
+const ALL_SCR_TYPES = [SCR_NAMES, SCR_COMMENTS, SCR_NONE];
+const NB_SCR = 3; // Nombre d'écrans
+
+/*
+ * AUTHENTIFICATION / HANDSHAKE
+ */
+function main_auth() {
+	let security_key = $("#key").val();
+	socket.emit('main.auth', {security_key: security_key});
+}
+
+socket.on('main.auth', function(e) {
+	console.log("Attente de la saisie de la clé de sécurité");
+	$(".main").hide();
+	$(".auth").show();
+	$("body").addClass("bg-default");
+});
+
+socket.on('main.auth.invalid', function(e) {
+	console.log("Invalid security key.");
+	alert("Clé de sécurité invalide!");
+});
+
+socket.on('main.welcome', function(e) {
+	Datas.ckey = e.ckey;
+	console.log("Connected to VotingServer. Welcome!");
+});
+
+socket.on('main.vw', function(VW) {
+	console.log("Received FW!");
+	Datas.VW = VW;
+
+	// Préparation de la page
+	$(".auth").hide();
+	$("body").removeClass("bg-default");
+	$(".main").show();
+	$("#key").val("");
+	$("#sys_state").text("Connecté. Votes en cours...");
+
+	// Cloture des votes
+	if(VW.votes_closed != null)
+		show_cloture(VW.votes_closed);
+
+	// Mise à jour des votes
+	update_votes(VW.votes, VW.candidates);
+
+	// Mise à jour des commentaires
+	update_comments(VW.enable_comments, VW.comments);
+
+	// Ajout de la liste des candidats
+	update_candidates(VW.current_candidate, VW.candidates);
+
+	// Mise à jour des types d'écrans
+	update_screens(VW.screens);
+});
+
+socket.on('update.votes', function(e) { update_votes(e.votes, e.candidates); });
+function update_votes(votes, candidates) {
+	let votes_count = Object.keys(votes).length;
+	$("#votes_count").text(votes_count);
+	let votes_table = document.getElementById("votes_table");
+	votes_table.innerHTML = '<thead class="thead-light">'
+                  + '<tr>'
+                  + '  <th scope="col">@ADDR</th>'
+                  + '  <th scope="col">Date</th>'
+                  + '  <th scope="col">Vote</th>'
+                  + '</tr>'
+                +'</thead><tbody></tbody>';
+
+	// Ajout de la liste des votes
+	for (let i = 0; i < votes_count; i++) {
+		let IP = Object.keys(votes)[i];
+		let row = votes_table.insertRow(-1);
+
+		let cell0 = row.insertCell(0); cell0.innerHTML = IP;
+		let cell1 = row.insertCell(1); cell1.innerHTML = votes[IP].date;
+
+		// Détermination du candidat
+		let cell2 = row.insertCell(2); cell2.innerHTML = getCandidateName(candidates, votes[IP].candidate);
+	}
+}
+
+socket.on('update.candidates', function(e) { update_candidates(e.candidates); });
+function update_candidates(current_candidate, candidates) {
+	// Candidat actuel
+	$("#passage").text( (current_candidate != null) ? "En cours..." : "Attente" );
+	let cc_name = (current_candidate != null) ? getCandidateName(candidates, current_candidate) : "-";
+	$("#current_candidate").text(cc_name);
+	$("#cc").text(cc_name);
+
+	let candidates_options = '';
+	let candidates_count = Object.keys(candidates).length;
+	let candidates_table = document.getElementById("candidates_table");
+	candidates_table.innerHTML = '<thead class="thead-light">'
+                  + '<tr>'
+                  + '  <th scope="col">Nom</th>'
+                  + '  <th scope="col">Nb votes</th>'
+                  + '  <th scope="col">Classement</th>'
+                  + '  <th scope="col">Etat</th>'
+                  + '  <th scope="col">Passage</th>'
+                  + '  <th scope="col"></th>'
+                  + '</tr>'
+                +'</thead><tbody></tbody>';
+
+	for (let i = 0; i < candidates_count; i++) {
+		let ID = Object.keys(candidates)[i];
+		candidates_options += '<option value="'+ID+'">'+candidates[ID].name+'</option>';
+
+		// Ajout dans le tableau
+		let row = candidates_table.insertRow(-1);
+		let cell0 = row.insertCell(0); cell0.innerHTML = '<strong>' + candidates[ID].name + '</strong>';
+		let cell1 = row.insertCell(1); cell1.innerHTML = '<center>' + candidates[ID].votes + '</center>';
+		let cell2 = row.insertCell(2); cell2.innerHTML = "<center>?</center>";
+		let cell3 = row.insertCell(3); cell3.innerHTML = '<center>' + ((candidates[ID].state == DONE) ? '<span class="badge badge-dot mr-4"><i class="bg-success"></i> Terminé</span>' : ((candidates[ID].state == CURRENT) ? '<span class="badge badge-dot mr-4"><i class="bg-info"></i> En cours...</span>' : '<span class="badge badge-dot mr-4"><i class="bg-danger"></i> Non débuté</span>')) + '</center>';
+		let cell4 = row.insertCell(4); cell4.innerHTML = '<center>' + ((candidates[ID].voting_time != null) ? candidates[ID].voting_time : "") + '</center>';
+		let cell5 = row.insertCell(5); cell5.innerHTML = "<a href='#' class='btn btn-sm btn-info' onclick=\"candidate_rename(" + ID + ")\"><i class='fa fa-tag'></i></a>&nbsp;<a href='#' class='btn btn-sm btn-danger' onclick=\"candidate_delete(" + ID + ")\"><i class='fa fa-trash'></i></a>";
+	}
+
+	// Ajout dans les listes
+	document.getElementById("next_candidate").innerHTML = candidates_options;
+	next_candidate_change(document.getElementById("next_candidate"));
+}
+
+socket.on('update.comments', function(e) { update_comments(e.comments); });
+function update_comments(enabled, comments) {
+	// Etat des commentaires
+	if(!enabled) {
+		$(".comments_enabled").hide();
+		$(".comments_disabled").show();
+		return;
+	}
+
+	$(".comments_enabled").show();
+	$(".comments_disabled").hide();
+
+	$("#comments_count").text(comments.length);
+	let comments_table = document.getElementById("comments_table");
+	comments_table.innerHTML = '<thead class="thead-light">'
+                  + '<tr>'
+                  + '  <th scope="col">Message</th>'
+                  + '  <th scope="col">&nbsp;</th>'
+                  + '</tr>'
+                +'</thead><tbody></tbody>';
+
+	// Ajout de la liste des votes
+	for (let i = 0; i < comments.length; i++) {
+		let row = comments_table.insertRow(-1);
+
+		let cell0 = row.insertCell(0); cell0.innerHTML = comments[i];
+		let cell1 = row.insertCell(1); cell1.innerHTML = "<a href='#' class='btn btn-sm btn-danger' onclick=\"comments_delete("+i+")\"><i class='fa fa-trash'></i></button>";
+	}
+}
+
+socket.on('screens.update', function(e) { update_screens(e.screens); });
+function update_screens(screens) {
+	// Pour chaque écran...
+	for(let sID = 0; sID < NB_SCR; sID++) {
+		let sType = screens["s" + sID];
+
+		// Pour chaque type d'écran
+		for(let i = 0; i < ALL_SCR_TYPES.length; i++) {
+			$("#" + sID + "-" + ALL_SCR_TYPES[i]).removeClass("btn-info btn-success btn-danger");
+
+			let classtoadd = "btn-info";
+			if(ALL_SCR_TYPES[i] == sType)
+				classtoadd = (sType == SCR_NONE) ? 'btn-danger' : 'btn-success';
+			
+			$("#" + sID + "-" + ALL_SCR_TYPES[i]).addClass(classtoadd);
+		}
+	}
+
+	console.log("Updated screens !");
+}
+
+function update_screen(sID, sType) {
+	// Si les données sont incohérentes, on ne fait rien
+	if(sID < 0 || sID >= NB_SCR || ALL_SCR_TYPES.indexOf(sType) < 0)
+		return;
+
+	socket.emit('screens.update', {ckey: Datas.ckey, sid: sID, stype: sType});
+}
+
+
+function getCandidateName(candidates, ID) {
+	return (ID in candidates) ? candidates[ID].name : 'ERR{candidate='+ID+'}'
+}
+
+function cloturer() {
+	let e = document.getElementById("cloture_delay");
+	let cloture_delay = e.options[e.selectedIndex].value;
+	if(!confirm('Etes-vous sûr de vouloir cloturer les votes dans ' + e.options[e.selectedIndex].innerHTML + ' ?'))
+		return;
+
+	socket.emit('cloturer', {ckey: Datas.ckey, delay: parseInt(cloture_delay)});
+}
+
+socket.on('cloture', function(e) {
+	console.log("Cloture des votes.");
+	Datas.VW = e;
+	update_candidates(e.current_candidate, e.candidates);
+	show_cloture(e.votes_closed);
+});
+
+function show_cloture(votes_closed) {
+	document.getElementById("votes_closed").innerHTML = votes_closed;
+	document.getElementById("action_cloture").innerHTML = "";
+	document.getElementById("action_candidats").innerHTML = '<div class="alert alert-danger" style="width: 100%"><i class="fa fa-hand-paper mr-3"></i> Les votes sont cloturés.</div>';
+	document.getElementById("sys_state").innerHTML = "Connecté. Votes cloturés.";
+}
+
+
+
+
+function candidate_start() {
+	socket.emit('candidate.start', {
+		ckey: Datas.ckey,
+		candidate: parseInt($("#next_candidate").val())
+	});
+}
+
+socket.on('candidate.start', function(e) {
+	console.log("Démarrage du candidat !");
+	Datas.VW = e;
+	update_candidates(e.current_candidate, e.candidates);
+});
+
+function candidate_end() {
+	socket.emit('candidate.end', {
+		ckey: Datas.ckey
+	});
+}
+
+socket.on('candidate.end', function(e) {
+	console.log("Fin du candidat !");
+	Datas.VW = e;
+	update_candidates(e.current_candidate, e.candidates);
+});
+
+function candidate_rename(ID) {
+	let new_name = prompt("Renommez le candidat :", Datas.VW.candidates[ID].name);
+	if(new_name == null || new_name == Datas.VW.candidates[ID].name)
+		return;
+
+	// Envoi de la demande
+	socket.emit('candidate.rename', {
+		ckey: Datas.ckey,
+		id: ID,
+		new_name: new_name
+	});
+}
+
+socket.on('candidate.rename', function(e) {
+	console.log("Renommage du candidat !");
+	Datas.VW = e;
+	update_candidates(e.current_candidate, e.candidates);
+	update_votes(e.votes, e.candidates)
+});
+
+function candidate_delete(ID) {
+	if(!(ID in Datas.VW.candidates))
+		return;
+
+	if(Datas.VW.current_candidate == ID) {
+		alert('Vous ne pouvez supprimer ce candidat pendant son passage.');
+		return;
+	}
+
+	if(!confirm("Etes-vous sûr de vouloir supprimer le candidat '" + Datas.VW.candidates[ID].name + "' ?"))
+		return;
+
+	// Envoi de la demande
+	socket.emit('candidate.delete', {
+		ckey: Datas.ckey,
+		id: ID
+	});
+}
+
+socket.on('candidate.delete', function(e) {
+	console.log("Suppression du candidat !");
+	Datas.VW = e;
+	update_candidates(e.current_candidate, e.candidates);
+	update_votes(e.votes, e.candidates)
+});
+
+function candidate_new() {
+	let name = prompt("Nommez le candidat :");
+	if(name == null)
+		return;
+
+	// Envoi de la demande
+	socket.emit('candidate.new', {
+		ckey: Datas.ckey,
+		name: name
+	});
+}
+
+socket.on('candidate.new', function(e) {
+	console.log("Nouveau candidat candidat !");
+	Datas.VW = e;
+	update_candidates(e.current_candidate, e.candidates);
+	update_votes(e.votes, e.candidates)
+});
+
+
+
+socket.on('comments.update', function(e) {
+	console.log("Comments updated !");
+	Datas.VW = e;
+	update_comments(e.enable_comments, e.comments);
+});
+
+function comments_toggle() {
+	socket.emit('comments.toggle', {
+		ckey: Datas.ckey
+	});
+}
+
+function comments_delete(ID) {
+	if(ID > Datas.VW.comments.length - 1)
+		return;
+
+	socket.emit('comments.delete', {
+		ckey: Datas.ckey,
+		id: ID
+	});
+}
+
+
+
+function update_security_key() {
+	socket.emit('main.update_security_key', {
+		ckey: Datas.ckey,
+		new_security_key: $("#editkey").val()
+	});
+}
+
+socket.on('main.update_security_key', function(e) {
+	console.log("Security key updated !");
+	Datas.VW = e;
+	$("#editkey").val("");
+	alert('Clé de sécurité modifiée !');
+});
+
+
+function generique() {
+	if(!confirm('Lancer le générique ? (sur DISPLAY 1)'))
+		return;
+
+	socket.emit('screens.generique', {
+		ckey: Datas.ckey
+	});
+}
+

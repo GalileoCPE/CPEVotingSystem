@@ -1,0 +1,93 @@
+<html lang="fr">
+	<head>
+		<title>CPEVotingSystem</title>
+
+		<meta charset="utf-8"/>
+		<meta name="description" content="CPE Voting System"/>
+		<meta name="author" content="Pierre AVINAIN, Galileo CPE Lyon"/>
+
+		<!-- Google Fonts -->
+		<link href="https://fonts.googleapis.com/css?family=Cabin:500" rel="stylesheet"/>
+		<link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet"/>
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" type="text/css" href="/common/css/bootstrap.css"/>
+
+		<!-- Custom style -->
+		<link rel="stylesheet" type="text/css" href="/vote/css/style-vote.css"/>
+	</head>
+	<body>
+		<div id="loader">
+			<h1>Connexion...</h1>
+			<img src="/vote/img/loader.gif" alt="loader"/>
+		</div>
+
+		<div id="body" style="display: none;">
+			<header>
+				<h1 id="event_name">CPEVotingSystem</h1>
+				<h2>by CPE Voting System</h2>
+			</header>
+
+			<div class="card card-error" id="err" style="display: none;">
+				<div class="card-body">
+			    	<div id="vote-body">
+		    			<h3>Vous devez être connecté au réseau Wi-Fi de l'évènement pour voter !</h3>
+		    		</div>
+				</div>
+			</div>
+
+			<div id="main">
+				<div class="card">
+					<div class="card-body">
+				    	<div class="row">
+				    		<div class="col-sm-9" id="vote-body">
+				    			<h2>Votre vote :</h2>
+				    			<h3><span id="voted_candidate"></span></h3>
+				    		</div>
+				    		<div class="col-sm-3" id="vote-img">
+				    			<img src="/vote/img/vote.png" alt="vote" width="100%"/>
+				    		</div>
+				    	</div>
+					</div>
+				</div>
+
+				<div class="card" id="comments">
+					<div class="card-body">
+						<h2>Mur des messages :</h2>
+				    	<div class="row">
+				    		<div class="col-sm-9" id="vote-body">
+					    		<input type=text class="form-control" name="message" id="message" placeholder="Saisissez un message..."/>
+					    	</div>
+					    	<div class="col-sm-3">
+				    			<button id="send_message" onclick="comments_new()">Envoyer !</button>
+				    		</div>
+				    	</div>
+					</div>
+				</div>
+
+				<center>
+					<h2 class="divider" id="votes_closed" style="display: none;">Les votes sont terminés !</h2>
+				</center>
+
+				<div id="voting_system">
+					<h2 class="divider">Candidats</h2>
+					<h3 class="subdivider">Appuyez sur un candidat pour voter pour lui</h3>
+					<div class="card">
+						<div class="card-body" id="candidates"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- jQuery -->
+		<script src="/common/js/jquery-3.3.1.min.js"></script>
+
+		<!-- Bootstrap -->
+		<script src="/common/js/bootstrap.js"></script>
+
+		<!-- Socket.IO -->
+		<script src="/socket.io/socket.io.js"></script>
+
+		<script src="/client/dyn-script-vote.js"></script>
+	</body>
+</html>

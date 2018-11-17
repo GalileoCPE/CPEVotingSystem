@@ -1,0 +1,61 @@
+.names-logo-up {
+  -webkit-animation: names-logo-up-animation 0.8s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+          animation: names-logo-up-animation 0.8s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+}
+
+.names-logo-down {
+  -webkit-animation: names-logo-down-animation 0.8s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+          animation: names-logo-down-animation 0.8s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
+}
+
+@-webkit-keyframes names-logo-up-animation {
+  0% {
+    width: 45%;
+    top: 35%;
+    left: 50%;
+  }
+  100% {
+    width: 60%;
+    top: 10%;
+    left: 25%;
+  }
+}
+
+@keyframes names-logo-up-animation {
+  0% {
+    width: 45%;
+    top: 35%;
+    left: 50%;
+  }
+  100% {
+    width: 60%;
+    top: 10%;
+    left: 25%;
+  }
+}
+
+@-webkit-keyframes names-logo-down-animation {
+  0% {
+    width: 60%;
+    top: 10%;
+    left: 25%;
+  }
+  100% {
+    width: 45%;
+    top: 35%;
+    left: 50%;
+  }
+}
+
+@keyframes names-logo-down-animation {
+  0% {
+    width: 60%;
+    top: 10%;
+    left: 25%;
+  }
+  100% {
+    width: 45%;
+    top: 35%;
+    left: 50%;
+  }
+}

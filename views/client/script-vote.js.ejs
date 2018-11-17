@@ -1,0 +1,228 @@
+/*
+ * ===== CPEVotingSystem =====
+ * | Script principal client vote
+ * | (c) 2018 - Pierre AVINAIN Galileo CPE Lyon
+ * ===========================
+ */
+
+console.log("====== CPEVotingSystem - (c) 2018 Pierre AVINAIN Galileo CPE LYON ======");
+
+const DONE = 1;
+const CURRENT = 2;
+const PENDING = 3;
+
+var Datas = {
+	name: "CPEVotingSystem",
+	vkey: null,
+	ip: "bla",
+	voted_candidate: null,
+	votes_closed: null,
+	candidates: [],
+	enable_comments: false,
+	comments: []
+}
+
+const COMMENT_DELAY = 30; // Délai d'attente entre 2 messages (en secondes)
+const COMMENT_MAXCARS = 100; // Nombre max de caractères
+var Last_comment_time = null;
+
+var socket = null;
+socket_connect(); // Connexion au serveur
+
+/*
+ * AUTHENTIFICATION / HANDSHAKE
+ */
+function socket_connect()
+{
+
+if(socket) {
+	socket.destroy();
+	delete socket;
+	socket = null;
+}
+
+socket = io.connect( "<%= APP_socketurl %>/?mode=vote", {
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax : 5000,
+    reconnectionAttempts: Infinity
+});
+
+socket.on( 'connect', function () {
+	console.log( 'Connected to server!' );
+});
+
+socket.on( 'disconnect', function () {
+	console.log( 'Disconnected from server!' );
+	$("#loader").show();
+	$("#body").hide();
+	window.setTimeout( 'socket_connect()', 5000 );
+});
+
+socket.on('main.welcome', function(e) {
+	console.log("Connected to VotingServer. Welcome!");
+	$("#loader").hide();
+	$("#body").show();
+	$("#err").hide();
+	$("#main").show();
+});
+
+socket.on('main.noARP', function(e) {
+	console.log("Pas d'entrées dans la table ARP, on attends le routeur...");
+});
+
+socket.on('main.invalid_ip', function(e) {
+	console.log("Source de connexion invalide.");
+	$("#loader").hide();
+	$("#body").show();
+	$("#main").hide();
+	$("#err").show();
+});
+
+socket.on('vote.datas', function(d) {
+	console.log("Updated datas.");
+
+	// Nom de l'évènement
+	if(Datas.name != d.name)
+		$("#event_name").text(d.name);
+
+	// Si on viens de cloturer les votes
+	if(Datas.votes_closed == null && d.votes_closed != null)
+		setTimeout(function() { close_votes() }, d.votes_closed - (new Date()).getTime());
+
+	Datas = d;
+	console.log(d);
+
+	// Vote enregistré
+	let voted_candidate = getCandidateName(Datas.candidates, Datas.voted_candidate);
+	$("#voted_candidate").text(voted_candidate);
+
+	// Mise à jour de la liste des candidats
+	let candidates = '';
+	let candidates_count = Object.keys(Datas.candidates).length;
+
+	for (let i = 0; i < candidates_count; i++) {
+		let ID = Object.keys(Datas.candidates)[i];
+
+		// On rend possible le vote que pour les candidats passés ou en cours
+		if(Datas.candidates[ID].state == PENDING)
+			continue;
+
+		// Si ce n'est pas le premier élément, on sépare
+		if(candidates != '')
+			candidates += '<hr/>';
+
+		candidates += '<div class="row candidate" onclick="votefor(\'' + ID + '\');">'
+						+ '<div class="col-sm-2" id="vote-img">'
+			    			+ '<img src="/vote/img/check-' + ((ID == Datas.voted_candidate) ? 'on' : 'off') + '.png" alt="check" width="100%"/>'
+			    		+ '</div>'
+			    		+ '<div class="col-sm-10" id="vote-body">'
+			    			+ '<h2>' + escapeHtml(Datas.candidates[ID].name) + '</h2>'
+			    		+ '</div>'
+			    	+ '</div>';
+	}
+
+	// Si on a pas encore de candidats
+	if(candidates == '') {
+		candidates = '<div class="row candidate">'
+						+ '<div class="col-sm-1" id="vote-img">'
+			    			+ '<img src="/vote/img/wait.png" alt="wait" width="100%"/>'
+			    		+ '</div>'
+			    		+ '<div class="col-sm-11" id="vote-body">'
+			    			+ '<h3>Vous pourrez voter dès que le premier candidat débutera</h3>'
+			    		+ '</div>'
+			    	+ '</div>';
+	}
+
+	$("#candidates").html(candidates);
+
+	// Commentaires
+	if(Datas.enable_comments)
+		$("#comments").show();
+	else
+		$("#comments").hide();
+});
+
+socket.on('vote.vote', function(d) {
+	if(d != true)
+		return;
+
+	console.log("Vote bien enregistré!");
+	alert("Votre vote a bien été pris en compte !");
+});
+
+socket.on('comments.new', function(d) {
+	if(d != true)
+		return;
+
+	$("#message").val("");
+	console.log("Commentaire bien enregistré!");
+	alert("Votre message a bien été déposé !");
+});
+
+}
+
+
+
+function getCandidateName(candidates, ID) {
+	return (ID in candidates) ? candidates[ID].name : "Vous n'avez pas encore voté";
+}
+
+function votefor(candidate) {
+	// On vérifie que les votes ne sont pas fermés
+	if(Datas.votes_closed != null && (new Date()).getTime() >= Datas.votes_closed)
+		return;
+
+	// Si il a déjà voté pour lui...
+	if(candidate == Datas.voted_candidate)
+		return;
+
+	socket.emit('vote.vote', {
+		vkey: Datas.vkey,
+		candidate: candidate
+	});
+}
+
+function close_votes() {
+	$("#voting_system").hide();
+	$("#votes_closed").show();
+}
+
+function comments_new() {
+	// On vérifie que les commentaires sont activés
+	if(!Datas.enable_comments)
+		return;
+
+	let message = $("#message").val();
+
+	// On ne fait rien si c'est un message vide
+	if(message == "")
+		return;
+
+	if(message.length > COMMENT_MAXCARS) {
+		alert('Votre message ne doit pas dépasser ' + COMMENT_MAXCARS + ' caractères.');
+		return;
+	}
+
+	// On évite le flood en limitant la fréquence d'envoi
+	if(Last_comment_time != null && (new Date()).getTime() - Last_comment_time.getTime() < COMMENT_DELAY * 1000) {
+		alert('Vous devez attendre ' + COMMENT_DELAY + 's. entre chaque message que vous déposez !');
+		return;
+	}
+
+	Last_comment_time = new Date(); // On enregistre la date du dernier message
+
+	socket.emit('comments.new', {
+		vkey: Datas.vkey,
+		message: message
+	});
+}
+
+function escapeHtml(unsafe) {
+    return unsafe
+         .replace(/&/g, "&amp;")
+         .replace(/</g, "&lt;")
+         .replace(/>/g, "&gt;")
+         .replace(/"/g, "&quot;")
+         .replace(/'/g, "&#039;");
+ }

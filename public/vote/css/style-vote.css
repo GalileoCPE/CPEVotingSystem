@@ -1,0 +1,105 @@
+body {
+	background-color: #3A64B7;
+	color: white;
+	padding-top: 40px;
+	padding-left: 5%;
+	padding-right: 5%;
+	font-family: 'Varela Round', sans-serif;
+}
+
+header {
+	text-align: center;
+	
+	margin-bottom: 60px;
+	text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
+}
+
+header > h1 {
+	font-size: 6rem !important;
+}
+
+header > h2 {
+	font-size: 3rem !important;
+}
+
+#loader {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+	background-color: white;
+}
+
+#loader > h1 {
+	position: absolute;
+	left: 15%;
+	top: 20%;
+	color: black;
+	font-size: 7rem;
+}
+
+#loader > img {
+	position: absolute;
+	left: 30%;
+	top: 40%;
+	width: 40vw;
+}
+
+.card {
+	box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+	color: black;
+}
+
+.card-error {
+	background-color: #bd0d04;
+	color: white;
+	text-align: center;
+}
+
+#vote-img {
+	text-align: center;
+}
+
+#vote-body > h2 {
+	font-size: 4rem;
+}
+
+#vote-body > h3 {
+	font-size: 2.5rem;
+}
+
+h2.divider {
+	margin-top: 60px;
+	font-size: 3.5rem;
+}
+
+h3.subdivider {
+	font-size: 2rem;
+	margin-bottom: 20px;
+}
+
+.candidate {
+	padding-top: 20px;
+	padding-bottom: 20px;
+}
+
+hr {
+	border-top: 2px solid rgba(0, 0, 0, 0.6) !important;
+}
+
+/* COMMENTAIRES */
+#comments {
+	display: none;
+	margin-top: 40px;
+}
+
+input#message {
+	height: auto;
+	font-size: 3rem;
+}
+
+#send_message {
+	font-size: 1.5rem;
+}

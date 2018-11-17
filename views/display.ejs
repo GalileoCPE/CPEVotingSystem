@@ -1,0 +1,113 @@
+<html lang="fr">
+	<head>
+		<title>CPEVotingSystem DISPLAY</title>
+
+		<meta charset="utf-8"/>
+		<meta name="description" content="CPE Voting System"/>
+		<meta name="author" content="Pierre AVINAIN, Galileo CPE Lyon"/>
+
+		<!-- Google Fonts -->
+		<link href="https://fonts.googleapis.com/css?family=Cabin:500" rel="stylesheet"/>
+		<link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet"/>
+
+		<!-- Bootstrap -->
+		<link rel="stylesheet" type="text/css" href="/common/css/bootstrap.css"/>
+
+		<!-- Custom style -->
+		<link rel="stylesheet" type="text/css" href="/display/css/slideout.css">
+		<link rel="stylesheet" type="text/css" href="/display/css/style-display.css"/>
+		<link rel="stylesheet" type="text/css" href="/display/css/blackscreen.css"/>
+		<link rel="stylesheet" type="text/css" href="/display/css/animations.css"/>
+
+		<link href="https://fonts.googleapis.com/css?family=Fredoka+One" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="/display/css/countdown.css"/>
+
+		<!-- RING (autor: Marco Barría - https://twitter.com/marco_bf) -->
+		<link rel="stylesheet" type="text/css" href="/display/css/ring.css"/>
+	</head>
+	<body>
+		<div id="blackscreen"></div>
+
+		<!-- BACKGROUND -->
+		<video autoplay muted loop poster="/display/img/default_bg.png" id="bgvid">
+		  <source src="/display/img/bg.webm" type="video/webm">
+		  <source src="/display/img/bg.mp4" type="video/mp4">
+		</video>
+
+		<!-- GENERIQUE -->
+		<video id="genevid">
+		  <source src="/display/custompack/generique.webm" type="video/webm">
+		  <source src="/display/custompack/generique.mp4" type="video/mp4">
+		</video>
+
+		<div id="text-scroller">
+			<div class="marquee" style="color: white;">
+				Pour voter, connectez-vous au Wi-Fi <span class="evidence"><%= hostpost %></span> et rendez-vous sur <span class="evidence"><%= domain %></span>
+			</div>
+		</div>
+
+		<div id="main">
+			<div id="names_section">
+				<div class="hoja"><span id="votes_count"></span><br/>votes</div>
+
+				<div id="singers">
+					<h1 id="singers-name"></h1>
+					<h2 id="singers-song"></h2>
+				</div>
+
+				<center>
+					<img id="names_logo" src="/display/custompack/logo.png" alt="logo"/>
+				</center>
+
+				<div class="particletext bubbles" style="
+				width: 100%;
+				height: 10px;
+				position: fixed;
+				bottom: -20%; left: 0;">
+				</div>
+			</div>
+			
+			<div id="comments_section">
+				<center><img id="comments_logo" src="/display/custompack/logo.png" alt="logo"/></center>
+				<div class="card">
+					<div class="card-body" id="comments"></div>
+				</div>
+			</div>
+
+			<div id="none_section">
+				<center><img id="none_logo" src="/display/custompack/logo.png" alt="logo"/></center>
+			</div>
+		</div>
+
+		<div id="countdown">
+			<h2 id="countdown-value-0" class="countdown-slide-out"></h2>
+			<h2 id="countdown-value-1" class="countdown-slide-out"></h2>
+		</div>
+
+		<script>
+			var DispID = <%= dispid %>;
+		</script>
+
+		<!-- jQuery -->
+		<script src="/common/js/jquery-3.3.1.min.js"></script>
+
+		<!-- Bootstrap -->
+		<script src="/common/js/bootstrap.js"></script>
+
+		<!-- Socket.IO -->
+		<script src="/socket.io/socket.io.js"></script>
+
+		<!-- Custom -->
+		<script src="/display/js/particles.js"></script>
+		<script src="/display/js/countdown.js"></script>
+
+		<script src="/display/js/jquery.marquee.js"></script>
+		<script src="/display/js/jquery.easing.js"></script>
+		
+		<script src="/display/js/text-scroller.js"></script>
+
+		<script src="/display/js/script-display.js"></script>
+
+		<script src="/client/dyn-script-display.js"></script>
+	</body>
+</html>
