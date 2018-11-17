@@ -204,11 +204,11 @@ function comments_new() {
 		return;
 	}
 
-	// On évite le flood en limitant la fréquence d'envoi
-	if(Last_comment_time != null && (new Date()).getTime() - Last_comment_time.getTime() < COMMENT_DELAY * 1000) {
-		alert('Vous devez attendre ' + COMMENT_DELAY + 's. entre chaque message que vous déposez !');
-		return;
-	}
+	// // On évite le flood en limitant la fréquence d'envoi
+	// if(Last_comment_time != null && (new Date()).getTime() - Last_comment_time.getTime() < COMMENT_DELAY * 1000) {
+	// 	alert('Vous devez attendre ' + COMMENT_DELAY + 's. entre chaque message que vous déposez !');
+	// 	return;
+	// }
 
 	Last_comment_time = new Date(); // On enregistre la date du dernier message
 

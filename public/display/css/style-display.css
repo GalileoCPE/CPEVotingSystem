@@ -28,6 +28,10 @@ img#none_logo {
 	margin-top: 20px;
 }
 
+.comments_card {
+  z-index: -100;
+}
+
 hr {
 	border-top: 2px solid rgba(0, 0, 0, 0.6) !important;
 }
@@ -77,7 +81,7 @@ hr {
 }
 
 #singers > h2 {
-   font-size: 3em;
+   font-size: 4em;
    margin-top: 0;
 }
 

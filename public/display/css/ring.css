@@ -14,22 +14,22 @@ body {
 .hoja {
   color: #dcdce2;
   position: absolute;
-  top: 70%;
+  top: 64%;
   left: 15%;
   margin-left: -140px;
   margin-top: -140px;
-  width: 26vh;
-  height: 26vh;
+  width: 32vh;
+  height: 32vh;
   text-align: center;
   font-family: 'Open Sans', sans-serif;
-  font-size: 2rem;
-  line-height: 40px;
+  font-size: 3rem;
+  line-height: 60px;
   -webkit-font-smoothing: antialiased;
   text-shadow: 5px 5px 10px rgba(0, 0, 0, 1);
-  padding-top: 8vh;
+  padding-top: 10vh;
 }
 #votes_count {
-  font-size: 4rem;
+  font-size: 5rem;
 }
 .hoja:after,
 .hoja:before {

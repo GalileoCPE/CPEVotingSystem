@@ -22,7 +22,7 @@ const SCR_NONE = "none";
 const ALL_SCR_TYPES = [SCR_NAMES, SCR_COMMENTS, SCR_NONE];
 const NB_SCR = 3; // Nombre d'écrans
 const GENERIQUE_SCREEN = 1; // Video de generique sur ecran 1
-const COMMENTS_NB = 8; // Nombre de messages à afficher sur l'écran
+const COMMENTS_NB = 7; // Nombre de messages à afficher sur l'écran
 
 /*
  * AUTHENTIFICATION / HANDSHAKE
@@ -79,16 +79,16 @@ function update_VW(VW) {
 	}
 
 	// Candidat actuel
-	let current_candidate = getCandidateName(VW.candidates, VW.current_candidate);
+	let current_candidate = getCandidate(VW.candidates, VW.current_candidate);
 	// Si on change de candidat...
 	if(Datas.VW == null || VW.current_candidate != Datas.VW.current_candidate) {
 		if(VW.current_candidate != null) {
 			// Si on avait un candidat avant, on fait un out d'abord
 			if(Datas.VW != null && Datas.VW.current_candidate != null) {
 				singer_out();
-				setTimeout(singer_in, 7000, current_candidate, " ");
+				setTimeout(singer_in, 7000, current_candidate.name, current_candidate.attr);
 			} else
-				singer_in(current_candidate, " ");
+				singer_in(current_candidate.name, current_candidate.attr);
 		} else
 			singer_out();
 	}
@@ -114,8 +114,8 @@ function update_VW(VW) {
 	Datas.VW = VW;
 }
 
-function getCandidateName(candidates, ID) {
-	return (ID in candidates) ? candidates[ID].name : '--';
+function getCandidate(candidates, ID) {
+	return (ID in candidates) ? candidates[ID] : null;
 }
 
 function escapeHtml(unsafe) {
