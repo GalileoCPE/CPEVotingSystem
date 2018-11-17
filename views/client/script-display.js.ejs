@@ -48,6 +48,9 @@ socket.on('cloture', function(VW) {
 	let delay = Math.round( (cloture_time - current_time)/1000 );
 	console.log("Cloture des votes à : " + VW.votes_closed + ", dans " + delay + "s.");
 	countdown(delay);
+
+	// Après ce délai, on supprime le bandeau d'explications pour voter
+	setTimeout(function() { $("#text-scroller").hide(); }, delay*1000);
 });
 
 // Ecran noir
@@ -61,9 +64,9 @@ socket.on('screens.generique', function(e) {
 });
 
 function update_VW(VW) {
-	// Nom de l'évènement
-	if(Datas.VW == null || VW.hostpost != Datas.VW.hostpost)
-		$("#hostpost-name").text(VW.hostpost);
+	// Si les votes sont déjà cloturés, on n'affiche pas le bandeau de vote
+	if(Datas.VW == null && VW.votes_closed != null)
+		$("#text-scroller").hide();
 
 	// Si on change de section...
 	let scrType = VW.screens["s" + DispID];
@@ -109,6 +112,10 @@ function update_VW(VW) {
 			comments_html += '<hr/>';
 		comments_html += '<h2>' + escapeHtml(VW.comments[i]) + '</h2>';
 	}
+
+	// Si on a aucun message
+	if(comments_html == '')
+		comments_html = '<h2><i>Déposez votre message ici !</i></h2>';
 	$("#comments").html(comments_html);
 
 	Datas.VW = VW;

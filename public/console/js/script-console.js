@@ -27,7 +27,7 @@ function updateHour() {
 }
 
 function next_candidate_change(select) {
-	if(select.selectedIndex == -1)
+	if(select == null || select.selectedIndex == -1)
 		return;
 	
 	let next_candidate_name = select.options[select.selectedIndex].innerHTML;

@@ -14,6 +14,15 @@ function countdown_value_out(id) {
 	$("#countdown-value-" + id).removeClass("countdown-slide-in");
 }
 
+function countdown_end() {
+	$("#countdown-end").addClass("countdown-end-in");
+	$("#countdown-end").removeClass("countdown-end-out");
+	setTimeout(function() {
+		$("#countdown-end").addClass("countdown-end-out");
+		$("#countdown-end").removeClass("countdown-end-in");
+	}, 5000);
+}
+
 function countdown(seconds) {
 	VID = 0;
 	for (let i = seconds; i >= 0; i--) {
@@ -22,6 +31,8 @@ function countdown(seconds) {
 			countdown_value_out(1 - VID);
 			if(i > 0)
 				setTimeout(countdown_value_in, 200, VID);
+			else
+				setTimeout(countdown_end, 200);
 			VID = 1 - VID;
 		}, (seconds - i)*1000);
 	}

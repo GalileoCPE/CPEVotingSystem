@@ -8,6 +8,8 @@
 
 #countdown {
 	color: white;
+  font-family: 'Fredoka One', cursive;
+  text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
 }
 
 #countdown > h2 {
@@ -15,8 +17,17 @@
   top: 10%;
   left: 42%;
   font-size: 25rem;
-  font-family: 'Fredoka One', cursive;
-  text-shadow: 5px 5px 10px rgba(0, 0, 0, 0.5);
+  color: white;
+}
+
+#countdown-end {
+  -webkit-transform: translateZ(1600px);
+            transform: translateZ(1600px);
+  opacity: 0;
+  position: absolute;
+  top: 6%;
+  left: 18% !important;
+  font-size: 9rem !important;
   color: white;
 }
 
@@ -28,6 +39,16 @@
 .countdown-slide-out {
 	-webkit-animation: slide-in-blurred-right 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) reverse both;
 	        animation: slide-in-blurred-right 0.5s cubic-bezier(0.230, 1.000, 0.320, 1.000) reverse both;
+}
+
+.countdown-end-in {
+  -webkit-animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+          animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) both;
+}
+
+.countdown-end-out {
+  -webkit-animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) reverse both;
+          animation: slide-in-bck-center 0.7s cubic-bezier(0.250, 0.460, 0.450, 0.940) reverse both;
 }
 
 /* ----------------------------------------------
@@ -126,4 +147,35 @@
     opacity: 1;
   }
 }
+
+/**
+ * ----------------------------------------
+ * animation slide-in-bck-center
+ * ----------------------------------------
+ */
+@-webkit-keyframes slide-in-bck-center {
+  0% {
+    -webkit-transform: translateZ(1600px);
+            transform: translateZ(1600px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    opacity: 1;
+  }
+}
+@keyframes slide-in-bck-center {
+  0% {
+    -webkit-transform: translateZ(1600px);
+            transform: translateZ(1600px);
+    opacity: 0;
+  }
+  100% {
+    -webkit-transform: translateZ(0);
+            transform: translateZ(0);
+    opacity: 1;
+  }
+}
+
 

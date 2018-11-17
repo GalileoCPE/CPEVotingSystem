@@ -139,7 +139,8 @@ function update_candidates(current_candidate, candidates) {
 	}
 
 	// Ajout dans les listes
-	document.getElementById("next_candidate").innerHTML = candidates_options;
+	if(document.getElementById("next_candidate") != null)
+		document.getElementById("next_candidate").innerHTML = candidates_options;
 	next_candidate_change(document.getElementById("next_candidate"));
 }
 
