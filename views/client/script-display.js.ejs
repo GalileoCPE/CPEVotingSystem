@@ -18,8 +18,9 @@ const PENDING = 3;
 
 const SCR_NAMES = "names";
 const SCR_COMMENTS = "comments";
+const SCR_AUDIO = "audio";
 const SCR_NONE = "none";
-const ALL_SCR_TYPES = [SCR_NAMES, SCR_COMMENTS, SCR_NONE];
+const ALL_SCR_TYPES = [SCR_NAMES, SCR_COMMENTS, SCR_AUDIO, SCR_NONE];
 const NB_SCR = 3; // Nombre d'écrans
 const GENERIQUE_SCREEN = 1; // Video de generique sur ecran 1
 const COMMENTS_NB = 7; // Nombre de messages à afficher sur l'écran
@@ -74,6 +75,10 @@ function update_VW(VW) {
 		for (let i = 0; i < ALL_SCR_TYPES.length; i++) {
 			$("#" + ALL_SCR_TYPES[i] + "_section").hide();
 		}
+
+		// Si on le demande, on démarre l'audio_visualizer
+		if(scrType == SCR_AUDIO)
+			audiovisualizer_start();
 
 		if(!VW.enable_comments && scrType == SCR_COMMENTS)
 			$("#none_section").show();
