@@ -37,7 +37,10 @@ function audiovisualizer_start() {
             mask.appendChild(path);
         }
         var doDraw = function () {
-            requestAnimationFrame(doDraw);
+            // On rafraichit l'animation toutes les 60ms
+            //requestAnimationFrame(doDraw);
+            setTimeout(doDraw, 60);
+
             analyser.getByteFrequencyData(frequencyArray);
           	var adjustedLength;
             for (var i = 0 ; i < 255; i++) {
@@ -56,5 +59,5 @@ function audiovisualizer_start() {
     }
 
     // Demande l'accès au Micro
-    navigator.getUserMedia({audio:true}, soundAllowed, soundNotAllowed);
+    navigator.getUserMedia({audio: true}, soundAllowed, soundNotAllowed);
 }

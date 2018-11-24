@@ -74,7 +74,7 @@ app.get('/', function(req, res) {
 
 // Affichage
 app.get('/display', function(req, res) {
-	res.render('display.ejs', {'APP_version': APP_version, 'dispid': 0});
+	res.render('display.ejs', {'APP_version': APP_version, 'dispid': 0, 'domain': Config.APP_domain, 'hostpost': Config.ROUTER_name});
 });
 app.get('/display/:dispid', function(req, res) {
 	if(!(/^\+?(0|[1-9]\d*)$/.test(req.params.dispid)))

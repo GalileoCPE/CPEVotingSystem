@@ -22,14 +22,22 @@
 		<link href="https://fonts.googleapis.com/css?family=Fredoka+One" rel="stylesheet">
 		<link rel="stylesheet" type="text/css" href="/display/css/countdown.css"/>
 
-		<!-- RING (autor: Marco Barría - https://twitter.com/marco_bf) -->
+		<!-- RING (author: Marco Barría - https://twitter.com/marco_bf) -->
 		<link rel="stylesheet" type="text/css" href="/display/css/ring.css"/>
 
-		<!-- AUDIO-VISUALIZER (autor: Zachary Skalko - https://codepen.io/zapplebee/pen/gbNbZE/) -->
+		<!-- AUDIO-VISUALIZER (author: Zachary Skalko - https://codepen.io/zapplebee/pen/gbNbZE/) -->
 		<link rel="stylesheet" type="text/css" href="/display/css/audiovisualizer.css"/>
 	</head>
 	<body>
 		<div id="blackscreen"></div>
+
+		<div id="promoscreen">
+			<h2>Directed by</h2>
+			<img src="/display/custompack/directedby_logo.png" alt="Logo organisateur" itemprop="logo"/>
+
+			<h2>Powered by</h2>
+			<img src="/display/img/logo_galileo.svg" alt="Logo Galileo CPE" itemprop="logo"/>
+		</div>
 
 		<!-- BACKGROUND -->
 		<video autoplay muted loop poster="/display/img/default_bg.png" id="bgvid">
@@ -39,7 +47,6 @@
 
 		<!-- GENERIQUE -->
 		<video id="genevid">
-		  <source src="/display/custompack/generique.webm" type="video/webm">
 		  <source src="/display/custompack/generique.mp4" type="video/mp4">
 		</video>
 

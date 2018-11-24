@@ -9,6 +9,27 @@
 	opacity: 0;
 }
 
+#promoscreen {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 400;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  text-align: center;
+  
+}
+
+#promoscreen > h2 {
+  margin-top: 8%;
+  color: white;
+}
+
+#promoscreen > img {
+  width: 15%;
+}
+
 .bs-in {
 	-webkit-animation: bs-animation-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
 	        animation: bs-animation-in 1s cubic-bezier(0.550, 0.085, 0.680, 0.530) both;
