@@ -42,16 +42,21 @@ socket.on('screens.update', function(VW) { update_VW(VW); });
 socket.on('main.update_security_key', function(VW) { update_VW(VW); });
 socket.on('cloture', function(VW) {
 	update_VW(VW);
-
-	// Affichage du compte a rebours si on est le DISPLAY1
-	if(DispID != 1)
-		return;
 	
 	let cloture_time = (new Date(VW.votes_closed)).getTime();
 	let current_time = (new Date()).getTime();
 	let delay = Math.round( (cloture_time - current_time)/1000 );
 	console.log("Cloture des votes à : " + VW.votes_closed + ", dans " + delay + "s.");
-	countdown(delay);
+
+	// Affichage du compte a rebours si on est le DISPLAY1
+	if(DispID == 1) {
+		countdown(delay);
+
+		// On n'affiche plus tous les écrans potentiels
+		for(let i = 0; i < ALL_SCR_TYPES.length; i++) {
+			$("#" + ALL_SCR_TYPES[i] + "_section").hide();
+		}
+	}
 
 	// Après ce délai, on supprime le bandeau d'explications pour voter
 	setTimeout(function() { $("#text-scroller").hide(); }, delay*1000);

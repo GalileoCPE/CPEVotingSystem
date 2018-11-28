@@ -112,6 +112,7 @@ server.listen(Config.APP_listenPort);
 
 APP_readyTime = Date.now(); // Enregistrement de l'heure
 Debug.success("CPEVotingSystem successfully loaded.");
+Debug.warn("If you're using Apache Proxy, initialisation may take a while (1-2 minutes).");
 console.log('------------------------------------------------------');
 
 /*

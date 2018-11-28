@@ -20,6 +20,9 @@ function countdown_end() {
 	setTimeout(function() {
 		$("#countdown-end").addClass("countdown-end-out");
 		$("#countdown-end").removeClass("countdown-end-in");
+
+		// Réaffichage du logo
+		$("#none_section").show();
 	}, 5000);
 }
 
