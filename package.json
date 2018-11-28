@@ -1,0 +1,24 @@
+{
+  "name": "cpevotingsystem",
+  "version": "1.0.0",
+  "description": "CPE Voting System",
+  "main": "server.js",
+  "directories": {
+    "doc": "doc",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pierreavinain/CPEVotingSystem.git.git"
+  },
+  "author": "Pierre AVINAIN, Galileo CPE",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pierreavinain/CPEVotingSystem.git/issues"
+  },
+  "homepage": "https://github.com/pierreavinain/CPEVotingSystem.git#readme"
+}

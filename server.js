@@ -46,6 +46,9 @@ Debug.success("'randomstring' loaded.");
 var fs = require('fs');
 Debug.success("'fs' loaded.");
 
+const pm2 = require('@pm2/io');
+Debug.success("'pm2' loaded.");
+
 var Router = require('./lib/Router.js');
 Router.init(Config.ROUTER_enable, Config.ROUTER_ip, Config.ROUTER_username, Config.ROUTER_password, Config.ROUTER_refresh);
 Debug.success("'*Router' loaded.");
@@ -58,6 +61,7 @@ var VotingSystem = require('./lib/VotingSystem.js');
 VotingSystem.init(Network, Router);
 Network.setVotingSystem(VotingSystem)
 Debug.success("'*VotingSystem' loaded.");
+
 
 /*
  * ENREGISTREMENT DES ROUTES
