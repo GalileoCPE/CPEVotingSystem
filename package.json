@@ -20,5 +20,12 @@
   "bugs": {
     "url": "https://github.com/pierreavinain/CPEVotingSystem.git/issues"
   },
-  "homepage": "https://github.com/pierreavinain/CPEVotingSystem.git#readme"
+  "homepage": "https://github.com/pierreavinain/CPEVotingSystem.git#readme",
+  "dependencies": {
+    "@pm2/io": "^2.4.7",
+    "ejs": "^2.6.1",
+    "randomstring": "^1.1.5",
+    "request": "^2.88.0",
+    "socket.io": "^2.1.1"
+  }
 }
