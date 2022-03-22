@@ -6,7 +6,7 @@
  */
 
 
-/* 
+/*
  * PARAMETRES GENERAUX
  */
 var APP_version = "1.0";  // Version de l'application
@@ -16,11 +16,11 @@ var APP_readyTime = null;     // Timestamp de l'application prête à décoder l
 
 
 
-/* 
+/*
  * CHARGEMENT DES LIBRAIRIES
  */
 var Config = require('./config.js'); // Chargement de la configuration
-var Debug = require('./lib/Debug.js'); // LIB: Affichage console 
+var Debug = require('./lib/Debug.js'); // LIB: Affichage console
 
 Debug.init(APP_version);
 Debug.info("Starting application...");
@@ -28,6 +28,7 @@ Debug.info("Loading modules...");
 
 var express = require('express');
 var app = express();
+app.set('trust proxy', true);
 var app_manager = express();
 Debug.success("'express' loaded.");
 
@@ -120,7 +121,7 @@ Debug.warn("If you're using Apache Proxy, initialisation may take a while (1-2 m
 console.log('------------------------------------------------------');
 
 /*
- * ARRÊT DU SERVEUR 
+ * ARRÊT DU SERVEUR
  */
  process.on('SIGINT', function() {
  	console.log('------------------------------------------------------');

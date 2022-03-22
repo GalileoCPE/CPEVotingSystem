@@ -5,14 +5,14 @@ function audiovisualizer_start() {
     if(audiovisualizer_started)
         return;
     audiovisualizer_started = true;
-    
+
     var paths = document.getElementsByTagName('path');
     var visualizer = document.getElementById('visualizer');
     var mask = visualizer.getElementById('mask');
     var h = document.getElementById('mic_request');
     var path;
     var report = 0;
-    
+
     // Si l'accès est accordé
     var soundAllowed = function (stream) {
         window.persistAudioStream = stream;
@@ -29,7 +29,7 @@ function audiovisualizer_start() {
         analyser.fftSize = 1024;
         var frequencyArray = new Uint8Array(analyser.frequencyBinCount);
         visualizer.setAttribute('viewBox', '0 0 255 255');
-      
+
 		// Affichage du résultat de la FFT
         for (var i = 0 ; i < 255; i++) {
             path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
@@ -59,5 +59,10 @@ function audiovisualizer_start() {
     }
 
     // Demande l'accès au Micro
-    navigator.getUserMedia({audio: true}, soundAllowed, soundNotAllowed);
+    // navigator.getUserMedia({audio: true}, soundAllowed, soundNotAllowed);
+    navigator.mediaDevices.getUserMedia({video: false, audio: true}).then( stream => {
+        soundAllowed(stream)
+    }).catch( err => {
+        soundNotAllowed(err)
+    });
 }
